@@ -54,6 +54,13 @@ public class Player extends GameObject {
         if(this.isCollision()){
             //Gdx.app.log("DEBUG", "AllowLeft: " + allowLeft + " AllowRight: " + allowRight + " AllowUp: " + allowUp + " AllowDown: " + allowDown);
 
+        	Gdx.app.log("DEBUG", 
+        			" Right: " + this.isRight() +
+        			" Left: " + this.isLeft() +
+        			" Up: " + this.isUp() +
+        			" Down: " + this.isDown()
+        	);
+        	
             if(this.isRight()){
                 if(knobPercentX < 0){
                     x += knobPercentX;
@@ -64,7 +71,6 @@ public class Player extends GameObject {
                     x += knobPercentX;
                 }
             }
-
             if(this.isUp()){
                 if(knobPercentY < 0){
                     y += knobPercentY;

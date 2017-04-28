@@ -10,9 +10,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -59,6 +56,7 @@ public class GameScreen implements Screen {
     private String collidedEnemyName;
     
     private boolean isMouse;
+    private int percentX = 0, percentY = 0;
 
     public GameScreen(MasterOfDisaster screenManager) {
         this.screenManager = screenManager;
@@ -164,17 +162,22 @@ public class GameScreen implements Screen {
         camera.update();
 
         if(Gdx.input.isKeyPressed(Input.Keys.W)){
-        	player.move(0 * playerSpeed, 1 * playerSpeed);
+        	percentX = 0;
+        	percentY = 1;
         }
         if(Gdx.input.isKeyPressed(Input.Keys.S)){
-        	player.move(0 * playerSpeed, -1 * playerSpeed);
+        	percentX = 0;
+        	percentY = -1;
         }
         if(Gdx.input.isKeyPressed(Input.Keys.A)){
-        	player.move(-1 * playerSpeed, 0 * playerSpeed);
+        	percentX = -1;
+        	percentY = 0;
         }
         if(Gdx.input.isKeyPressed(Input.Keys.D)){
-        	player.move(1 * playerSpeed, 0 * playerSpeed);
+        	percentX = 1;
+        	percentY = 0;
         }
+        
         
         if(Gdx.input.isButtonPressed(Input.Buttons.LEFT)){	
         	if(isMouse){
@@ -209,6 +212,9 @@ public class GameScreen implements Screen {
         }
         
         player.collideWithMap(map.getCollisionMap());
+        player.move(percentX * playerSpeed, percentY * playerSpeed);
+        percentX = 0;
+        percentY = 0;
 
         camera.position.x = player.getX();
         camera.position.y = player.getY();
