@@ -24,7 +24,6 @@ import com.github.htw.mom.gameobject.Healthbar;
 import com.github.htw.mom.gameobject.ItemInvulnerability;
 import com.github.htw.mom.gameobject.Player;
 import com.github.htw.mom.map.GameMap;
-import com.github.htw.mom.utils.GameTouchpad;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -32,13 +31,9 @@ import java.util.Random;
 public class GameScreen implements Screen {
 
     private final MasterOfDisaster screenManager;
-    private Vector3 calib;
-    private boolean accelero;
     private OrthographicCamera camera;
     private SpriteBatch batch;
     private Stage stage;
-
-    private GameTouchpad touchpad;
 
     private GameMap map;
     private Player player;
@@ -53,7 +48,6 @@ public class GameScreen implements Screen {
 
     private TextureAtlas atlas;
     private Skin skin;
-    private TextButton buttonFire;
     private BitmapFont font;
 
     private Label labelScore;
@@ -63,25 +57,15 @@ public class GameScreen implements Screen {
 
     private String collidedItemName;
     private String collidedEnemyName;
+    
+    private boolean isMouse;
 
     public GameScreen(MasterOfDisaster screenManager) {
         this.screenManager = screenManager;
         create();
     }
-
-    private void getPreferences(){
-        // Einlesen der Settings Parameter für diese Klasse mit Default Werten
-        Preferences settings = Gdx.app.getPreferences("ProjectY_settings");
-        float x=settings.getFloat("x",0f); // 0f ist für wenn ein Fehler irgendwo Auftritt
-        float y=settings.getFloat("y",0f);
-        float z=settings.getFloat("z",0f);
-        calib.set(x,y,z);
-        accelero=settings.getBoolean("accelero",false);
-    }
+    
     private void create(){
-
-
-        calib=new Vector3();
         batch = new SpriteBatch();
 
         camera = new OrthographicCamera();
@@ -91,6 +75,8 @@ public class GameScreen implements Screen {
         collidedEnemyName = "";
         collidedItemName = "";
 
+        isMouse = true;
+        
         //** GAME ** -START
         map = new GameMap("map.tmx",scale);
 
@@ -134,11 +120,6 @@ public class GameScreen implements Screen {
         //** GAME ** -END
 
         //** GUI ** - START
-        touchpad = new GameTouchpad("data/touchBackground.png","data/touchKnob.png");
-        touchpad.setRadius(10);
-        touchpad.setBounds(15,15,200,200);
-        touchpad.setPosition(Gdx.graphics.getWidth()- touchpad.getTouchpad().getWidth() -20, 20);
-
         stage = new Stage(new ScreenViewport(), batch);
 
         // Button for shooting and Score
@@ -165,39 +146,11 @@ public class GameScreen implements Screen {
         labelRound.setWidth(400);
         labelRound.setPosition(40, Gdx.graphics.getHeight() - labelScore.getHeight()-20);
 
-     // TODO: LOS WERDEN !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        buttonFire = new TextButton("Fire", textButtonStyle);
-        buttonFire.setWidth(300);
-        buttonFire.setHeight(120);
-        buttonFire.setPosition(20, 20);
-        buttonFire.pad(20);
-        buttonFire.addListener(new InputListener(){
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                Gdx.app.log("DEBUG", "Fire");
-
-                bullets.add(
-                        new Bullet(
-                            "data/bullet.png",
-                            player.getX()+64-16,
-                            player.getY()+64-16,
-                            "Bullet")
-                );
-                bullets.get(bullets.size()-1).setDirectionX(touchpad.getWasPrecentX());
-                bullets.get(bullets.size()-1).setDirectionY(touchpad.getWasPrecentY());
-
-                return super.touchDown(event, x, y, pointer, button);
-            }
-        });
-
         stage.addActor(labelRound);
         stage.addActor(labelScore);
-        stage.addActor(buttonFire);
-        stage.addActor(touchpad.getTouchpad());
         stage.addActor(hp.getBar());
         Gdx.input.setInputProcessor(stage);
         //** GUI ** - END
-        getPreferences();
     }
 
     @Override
@@ -206,23 +159,55 @@ public class GameScreen implements Screen {
     int test=0;
     @Override
     public void render(float delta) {
-
-
         Gdx.gl.glClearColor(0.100f, 0.314f, 0.314f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         camera.update();
-        touchpad.calcFuture();
 
-        // Ist Accelero aktiv und aktiviert
-        if(Gdx.input.isPeripheralAvailable(Input.Peripheral.Accelerometer)&&accelero) {
-            float accelZ = Gdx.input.getAccelerometerZ() - calib.z; // aktuelle Position - der Ruhelage
-            float accelY = Gdx.input.getAccelerometerY() - calib.y;
-            player.move(accelY, accelZ); // Bewegung des Spielers
-
-
-        }else {
-            player.move(touchpad.getTouchpad().getKnobPercentX() * playerSpeed, touchpad.getTouchpad().getKnobPercentY() * playerSpeed);
+        if(Gdx.input.isKeyPressed(Input.Keys.W)){
+        	player.move(0 * playerSpeed, 1 * playerSpeed);
         }
+        if(Gdx.input.isKeyPressed(Input.Keys.S)){
+        	player.move(0 * playerSpeed, -1 * playerSpeed);
+        }
+        if(Gdx.input.isKeyPressed(Input.Keys.A)){
+        	player.move(-1 * playerSpeed, 0 * playerSpeed);
+        }
+        if(Gdx.input.isKeyPressed(Input.Keys.D)){
+        	player.move(1 * playerSpeed, 0 * playerSpeed);
+        }
+        
+        if(Gdx.input.isButtonPressed(Input.Buttons.LEFT)){	
+        	if(isMouse){
+	        	bullets.add(
+	                    new Bullet(
+	                        "data/bullet.png",
+	                        player.getX()+64-16,
+	                        player.getY()+64-16,
+	                        "Bullet")
+	            );
+	        	
+	        	/*
+	        	Vector3 vec = new Vector3(Gdx.input.getX(),Gdx.input.getY(),0);
+	        	camera.unproject(vec);
+	        	*/
+	        	
+	        	float pathX = Gdx.input.getX() - ((Gdx.graphics.getWidth()/2)+64);
+	        	float pathY = Gdx.input.getY() - ((Gdx.graphics.getHeight()/2)-64);
+	        	
+	        	float distance = (float) Math.sqrt(pathX*pathX+pathY*pathY);
+	        	
+	        	float directionX = pathX / distance;
+	        	float directionY = pathY / distance;
+	        	
+        		bullets.get(bullets.size()-1).setDirectionX(directionX);
+        		bullets.get(bullets.size()-1).setDirectionY(-directionY);
+	        	
+	            isMouse = false;
+        	}
+        }else{
+        	isMouse = true;
+        }
+        
         player.collideWithMap(map.getCollisionMap());
 
         camera.position.x = player.getX();

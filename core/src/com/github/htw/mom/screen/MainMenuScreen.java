@@ -80,9 +80,8 @@ public class MainMenuScreen implements Screen {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 Gdx.app.log("DEBUG", "Pressed");
-
-                screenManager.setScreen(new SettingsScreen(screenManager)); // öffnen den Einstellungs View
-                return super.touchDown(event, x, y, pointer, button); //Button irgendwas
+                
+                return super.touchDown(event, x, y, pointer, button);
             }
         });
 
