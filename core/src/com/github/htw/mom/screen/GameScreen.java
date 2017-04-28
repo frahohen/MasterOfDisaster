@@ -2,7 +2,6 @@ package com.github.htw.mom.screen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -113,8 +112,8 @@ public class GameScreen implements Screen {
         bullets = new ArrayList<Bullet>();
 
         // Camera set to player position
-        camera.position.x = player.getX();
-        camera.position.y = player.getY();
+        camera.position.x = player.getX()+64;
+        camera.position.y = player.getY()+64;
         //** GAME ** -END
 
         //** GUI ** - START
@@ -136,12 +135,12 @@ public class GameScreen implements Screen {
         score = 0;
         Label.LabelStyle labelStyle = new Label.LabelStyle( font, Color.WHITE);
         labelScore = new Label("Score: "+score, labelStyle);
-        labelScore.setWidth(400);
+        labelScore.setWidth(100);
         labelScore.setPosition(Gdx.graphics.getWidth()- labelScore.getWidth()-40, Gdx.graphics.getHeight() - labelScore.getHeight()-20);
 
         round = 0;
         labelRound = new Label("Round: "+round, labelStyle);
-        labelRound.setWidth(400);
+        labelRound.setWidth(100);
         labelRound.setPosition(40, Gdx.graphics.getHeight() - labelScore.getHeight()-20);
 
         stage.addActor(labelRound);
@@ -189,13 +188,8 @@ public class GameScreen implements Screen {
 	                        "Bullet")
 	            );
 	        	
-	        	/*
-	        	Vector3 vec = new Vector3(Gdx.input.getX(),Gdx.input.getY(),0);
-	        	camera.unproject(vec);
-	        	*/
-	        	
-	        	float pathX = Gdx.input.getX() - ((Gdx.graphics.getWidth()/2)+64);
-	        	float pathY = Gdx.input.getY() - ((Gdx.graphics.getHeight()/2)-64);
+	        	float pathX = Gdx.input.getX() - ((Gdx.graphics.getWidth()/2));
+	        	float pathY = Gdx.input.getY() - ((Gdx.graphics.getHeight()/2));
 	        	
 	        	float distance = (float) Math.sqrt(pathX*pathX+pathY*pathY);
 	        	
@@ -216,8 +210,8 @@ public class GameScreen implements Screen {
         percentX = 0;
         percentY = 0;
 
-        camera.position.x = player.getX();
-        camera.position.y = player.getY();
+        camera.position.x = player.getX()+64;
+        camera.position.y = player.getY()+64;
 
         map.render(camera);
 
