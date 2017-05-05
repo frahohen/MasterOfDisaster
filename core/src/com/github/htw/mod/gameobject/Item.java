@@ -1,4 +1,4 @@
-package com.github.htw.mom.gameobject;
+package com.github.htw.mod.gameobject;
 
 public class Item extends GameObject {
 

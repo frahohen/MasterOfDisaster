@@ -1,4 +1,4 @@
-package com.github.htw.mom.map;
+package com.github.htw.mod.map;
 
 import java.util.ArrayList;
 

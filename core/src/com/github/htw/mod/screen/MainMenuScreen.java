@@ -1,4 +1,4 @@
-package com.github.htw.mom.screen;
+package com.github.htw.mod.screen;
 
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
@@ -69,7 +69,7 @@ public class MainMenuScreen implements Screen {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 Gdx.app.log("DEBUG", "Pressed");
-
+                screenManager.setScreen(new GameScreen(screenManager));
                 return super.touchDown(event, x, y, pointer, button);
             }
         });

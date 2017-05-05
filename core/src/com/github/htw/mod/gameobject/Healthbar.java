@@ -1,4 +1,4 @@
-package com.github.htw.mom.gameobject;
+package com.github.htw.mod.gameobject;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;

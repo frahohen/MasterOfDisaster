@@ -1,4 +1,4 @@
-package com.github.htw.mom.gameobject;
+package com.github.htw.mod.gameobject;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
-import com.github.htw.mom.map.CollisionMap;
+import com.github.htw.mod.map.CollisionMap;
 
 import java.util.ArrayList;
 

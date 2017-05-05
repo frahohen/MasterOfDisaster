@@ -1,4 +1,4 @@
-package com.github.htw.mom.map;
+package com.github.htw.mod.map;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.MapProperties;

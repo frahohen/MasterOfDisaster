@@ -1,4 +1,4 @@
-package com.github.htw.mom.screen;
+package com.github.htw.mod.screen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -13,15 +13,25 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.github.htw.mom.gameobject.Bullet;
-import com.github.htw.mom.gameobject.GameObject;
-import com.github.htw.mom.gameobject.Healthbar;
-import com.github.htw.mom.gameobject.ItemInvulnerability;
-import com.github.htw.mom.gameobject.Player;
-import com.github.htw.mom.map.GameMap;
+import com.github.htw.mod.gameobject.Bullet;
+import com.github.htw.mod.gameobject.GameObject;
+import com.github.htw.mod.gameobject.Healthbar;
+import com.github.htw.mod.gameobject.ItemInvulnerability;
+import com.github.htw.mod.gameobject.Player;
+import com.github.htw.mod.map.GameMap;
+import com.github.htw.mod.networking.Client;
+import com.github.htw.mod.networking.Server;
 
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
 import java.util.Random;
 
 public class GameScreen implements Screen {
@@ -148,6 +158,40 @@ public class GameScreen implements Screen {
         stage.addActor(hp.getBar());
         Gdx.input.setInputProcessor(stage);
         //** GUI ** - END
+        
+        //** SERVER ** - START
+        List<String> addresses = new ArrayList<String>();
+
+        try {
+            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+            for(NetworkInterface ni : Collections.list(interfaces)){
+                for(InetAddress address : Collections.list(ni.getInetAddresses())){
+                    if(address instanceof Inet4Address){
+                        addresses.add(address.getHostAddress());
+                    }
+                }
+            }
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
+
+        for(int i = 0; i < addresses.size(); i++){
+            Gdx.app.log("DEBUG","Address: " + addresses.get(i));
+        }
+
+        final Server server = new Server("localhost",9999);
+        new Thread(server).start();
+
+        Timer.schedule(new Timer.Task() {
+            @Override
+            public void run() {
+                new Thread(new Client(server.getIp(), server.getPort())).start();
+                new Thread(new Client(server.getIp(), server.getPort())).start();
+                new Thread(new Client(server.getIp(), server.getPort())).start();
+            }
+        }, 2);
+
+        //** SERVER ** - END
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.github.htw.mom.screen;
+package com.github.htw.mod.screen;
 
 import com.badlogic.gdx.Game;
 
