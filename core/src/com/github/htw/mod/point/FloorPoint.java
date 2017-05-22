@@ -1,11 +1,11 @@
-package com.github.htw.mom.point;
+package com.github.htw.mod.point;
 
-public class SpawnPoint {
+public class FloorPoint {
 
     private float x;
     private float y;
 
-    public SpawnPoint(float x, float y) {
+    public FloorPoint(float x, float y) {
         this.x = x;
         this.y = y;
     }

@@ -2,7 +2,7 @@ package com.github.htw.mod.map;
 
 import java.util.ArrayList;
 
-import com.github.htw.mom.point.FloorPoint;
+import com.github.htw.mod.point.FloorPoint;
 
 public class FloorMap {
 

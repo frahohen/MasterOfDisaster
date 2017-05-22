@@ -2,7 +2,7 @@ package com.github.htw.mod.map;
 
 import java.util.ArrayList;
 
-import com.github.htw.mom.point.SpawnPoint;
+import com.github.htw.mod.point.SpawnPoint;
 
 public class SpawnMap {
 
