@@ -21,6 +21,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
+import com.github.htw.mod.networking.Client;
 
 
 public class MultiplayerMenuScreen implements Screen {
@@ -34,6 +35,9 @@ public class MultiplayerMenuScreen implements Screen {
     private TextButton buttonExit, buttonHostGame, buttonJoinGame;
     private BitmapFont font;
     private TextField tfIpAddress;
+    
+    private Client client;
+    private boolean isValidIP;
 
     public MultiplayerMenuScreen(MasterOfDisaster screenManager) {
         this.screenManager = screenManager;
@@ -67,13 +71,15 @@ public class MultiplayerMenuScreen implements Screen {
         buttonHostGame.addListener(new InputListener(){
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+            	isValidIP = false;
+            	
                 Gdx.app.log("DEBUG", "Join Game");
                 Gdx.input.getTextInput(new Input.TextInputListener() {
                     @Override
                     public void input (String text) {
                         //TEXT = IP ADDRESS für Multiplayer zum verwenden
-
-                        boolean validIP=true;
+                    	boolean validIP = true;
+                        
                         String [] x =text.split("\\.");
                         if(x.length!=4){
                             validIP=false;
@@ -90,8 +96,10 @@ public class MultiplayerMenuScreen implements Screen {
                         }
 
                        if(validIP){
-                            //Verbindung hier aufbauen...
-                            screenManager.setScreen(new LobbyScreen(screenManager,false));
+                    	   //Verbindung hier aufbauen...
+                    	   // Create Client
+                     	   client = new Client(text, 9999);
+                     	   isValidIP = true;
                        }else{
                            //ERRORMESSAGE ANZEIGEN(muss ich noch machen)
                        }
@@ -100,8 +108,7 @@ public class MultiplayerMenuScreen implements Screen {
                     public void canceled () {
                         //??????? Hat keine Funktion muss aber wegen abstract-override da sein (Vlt kommt ja noch ein sinn xD)
                     }
-                }, "Enter Host-IP-Address", "192.168.0.1", "Enter here");
-
+                }, "Enter Host-IP-Address", "127.0.0.1", "Enter here");
 
                 return super.touchDown(event, x, y, pointer, button);
             }
@@ -154,6 +161,13 @@ public class MultiplayerMenuScreen implements Screen {
         Gdx.gl.glClearColor(0,0,0,1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        if(isValidIP){
+            // Start Client
+            new Thread(client).start();
+        	screenManager.setScreen(new LobbyScreen(screenManager,false,client));
+        	isValidIP = false;
+        }
+        
         stage.act(delta);
         stage.draw();
     }

@@ -6,8 +6,11 @@ import com.badlogic.gdx.Net;
 import com.badlogic.gdx.net.ServerSocket;
 import com.badlogic.gdx.net.ServerSocketHints;
 import com.badlogic.gdx.net.Socket;
+import com.github.htw.mod.networking.message.MessageTag;
+import com.github.htw.mod.point.MapPosition;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Server implements Runnable {
 
@@ -15,12 +18,17 @@ public class Server implements Runnable {
     private int port;
     private int id;
     private ArrayList<ServerThread> serverThreads;
+    
+    private int numberOfClientsConnected;
+    private HashMap<String, MapPosition> playerAndPosition;
 
     public Server(String ip, int port) {
         this.ip = ip;
         this.port = port;
+        numberOfClientsConnected = 0;
         id = 0;
         serverThreads = new ArrayList<ServerThread>();
+        playerAndPosition = new HashMap<String, MapPosition>();
     }
 
     @Override
@@ -38,16 +46,28 @@ public class Server implements Runnable {
                     new Thread(serverThreads.get(serverThreads.size()-1)).start();
                 }
             }catch (Exception e){
-                Gdx.app.log("SERVER", "An error occured", e);
+                //Gdx.app.log("SERVER", "An error occured", e);
+            	Gdx.app.log("SERVER:", "Waiting");
             }
         }
     }
 
-    public synchronized void updateClients(int id){
+    public synchronized void updateClients(String labelMessage){
         for(int i = 0; i < serverThreads.size(); i++){
-            if(id != serverThreads.get(i).getId()){
-                // Update everyone else but not the client that occured a change
-            }
+            // Update everyone else but not the client that occured a change
+        	if(labelMessage.equals(MessageTag.START)){
+        		serverThreads.get(i).setTriggerMessage(labelMessage);
+        	}
+        	
+        	if(labelMessage.equals(MessageTag.CONNECTED)){
+        		//Create for every Server Thread a Message that is been send
+        		serverThreads.get(i).setTriggerMessage(labelMessage);
+        	}
+        	
+        	if(labelMessage.equals(MessageTag.POSITION)){
+        		//Create for every Server Thread a Message that is been send
+        		serverThreads.get(i).setTriggerMessage(labelMessage);
+        	}
         }
     }
 
@@ -55,7 +75,23 @@ public class Server implements Runnable {
         return serverThreads.size();
     }
 
-    public String getIp() {
+    public synchronized int getNumberOfClientsConnected() {
+		return numberOfClientsConnected;
+	}
+
+	public synchronized void setNumberOfClientsConnected(int numberOfClientsConnected) {
+		this.numberOfClientsConnected = numberOfClientsConnected;
+	}
+
+	public synchronized HashMap<String, MapPosition> getPlayerAndPosition() {
+		return playerAndPosition;
+	}
+
+	public synchronized void setPlayerAndPosition(HashMap<String, MapPosition> playerAndPosition) {
+		this.playerAndPosition = playerAndPosition;
+	}
+
+	public String getIp() {
         return ip;
     }
 

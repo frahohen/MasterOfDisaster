@@ -14,6 +14,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.github.htw.mod.networking.Client;
+import com.github.htw.mod.networking.Server;
+import com.github.htw.mod.networking.message.MessageTag;
 
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -37,14 +40,27 @@ public class LobbyScreen implements Screen {
     private TextButton buttonExit, buttonStartGame;
     private BitmapFont font;
     private Label labelInfo1,labelInfo2,labelInfo3,labelPlayerConnected;
+    
+    private Server server;
+    private Client client;
+    
+    private boolean host;
+    private boolean startGame;
 
     public LobbyScreen(MasterOfDisaster screenManager,boolean host) {
         this.screenManager = screenManager;
-        create(host);
+        this.host = host;
+        startGame = false;
+        create();
+    }
+    
+    public LobbyScreen(MasterOfDisaster screenManager,boolean host,Client client) {
+    	this.client = client;
+        this.screenManager = screenManager;
+        create();
     }
 
-    private void create(final boolean host){
-
+    private void create(){
         Gdx.app.setLogLevel(Application.LOG_DEBUG);
 
         stage = new Stage();
@@ -74,6 +90,7 @@ public class LobbyScreen implements Screen {
         //Fraglich?? wollen wir haben, dass er anzeigt wieviele spieler gerade in der Lobby sind?
         labelPlayerConnected  = new Label("Spieler verbunden:---", labelStyle);
         labelInfo3.setWidth(500);
+        
         if(host){
 
             try {
@@ -90,6 +107,16 @@ public class LobbyScreen implements Screen {
                     }
                 }
                 labelInfo3.setText("Host-IP: "+addresses.get(0));
+                
+                // Create Server
+                server = new Server("localhost", 9999);
+                // Start Server
+                new Thread(server).start();
+                
+                // Create Host
+                client = new Client(server.getIp(), server.getPort());
+                // Start Host
+                new Thread(client).start();
 
             }catch(Exception e){
                labelInfo3.setText("Error getting Host-IP!");
@@ -104,7 +131,9 @@ public class LobbyScreen implements Screen {
                     /*Hier wird das Multiplayer Spiel gestartet (nur vom Host aus möglich)
                     screenManager.setScreen(new MultiplayerGameScreen(screenManager));
                      */
-
+                    startGame = true;
+                    
+                    //screenManager.setScreen(new GameScreen(screenManager,host));
                     return super.touchDown(event, x, y, pointer, button);
                 }
             });
@@ -124,6 +153,14 @@ public class LobbyScreen implements Screen {
                 /*          ------------
                        HIER DIE VERBINDUNG ABBRECHEN
                             ---------------  */
+                
+                if(host){
+                	client = null;
+                	server = null;
+                } else {
+                	client = null;
+                }
+                
                 screenManager.setScreen(new MainMenuScreen(screenManager));
                 return super.touchDown(event, x, y, pointer, button);
             }
@@ -160,6 +197,23 @@ public class LobbyScreen implements Screen {
         Gdx.gl.glClearColor(0,0,0,1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        if(startGame){
+        	server.updateClients(MessageTag.START);
+        	startGame = false;
+        }
+        if(client.isStartGame()){
+    		screenManager.setScreen(new GameScreen(screenManager,host,client,server));
+    	}
+        
+        if(host){
+        	// Get from Server the Number
+        	labelPlayerConnected.setText("Spieler verbunden: " + server.getNumberOfClientsConnected());
+        	
+        }else{
+        	// Get the update from Server
+        	labelPlayerConnected.setText("Spieler verbunden: " + client.getNumberOfClientsConnected());
+        }
+        
         stage.act(delta);
         stage.draw();
     }

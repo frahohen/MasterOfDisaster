@@ -1,11 +1,13 @@
 package com.github.htw.mod.point;
 
-public class SpawnPoint {
+import java.io.Serializable;
+
+public class MapPosition implements Serializable {
 
     private float x;
     private float y;
 
-    public SpawnPoint(float x, float y) {
+    public MapPosition(float x, float y) {
         this.x = x;
         this.y = y;
     }

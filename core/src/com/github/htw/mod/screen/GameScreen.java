@@ -23,6 +23,8 @@ import com.github.htw.mod.gameobject.Player;
 import com.github.htw.mod.map.GameMap;
 import com.github.htw.mod.networking.Client;
 import com.github.htw.mod.networking.Server;
+import com.github.htw.mod.networking.message.MessageTag;
+import com.github.htw.mod.point.MapPosition;
 
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -66,9 +68,21 @@ public class GameScreen implements Screen {
     
     private boolean isMouse;
     private int percentX = 0, percentY = 0;
+    
+    private boolean host;
+    private Server server;
+    private Client client;
 
     public GameScreen(MasterOfDisaster screenManager) {
         this.screenManager = screenManager;
+        create();
+    }
+    
+    public GameScreen(MasterOfDisaster screenManager, boolean host,Client client,Server server) {
+        this.screenManager = screenManager;
+        this.host = host;
+        this.client = client;
+        this.server = server;
         create();
     }
     
@@ -86,28 +100,45 @@ public class GameScreen implements Screen {
         
         //** GAME ** -START
         map = new GameMap("map.tmx",scale);
-
-        player = new Player(
-                "data/playerExample.png",
-                map.getSpawnMap().getSpawnPoint(0).getX()-64,
-                map.getSpawnMap().getSpawnPoint(0).getY()-64,
-                "Player0"
-        );
-
-        player.setRender(true);
-        hp= new Healthbar();
         enemies = new ArrayList<GameObject>();
-        for(int i = 1; i < map.getSpawnMap().getSize(); i++){
-            enemies.add(
-                    new GameObject(
-                            "data/playerExample.png",
-                            map.getSpawnMap().getSpawnPoint(i).getX()-64,
-                            map.getSpawnMap().getSpawnPoint(i).getY()-64,
-                            "Enemy"+i
-                    )
-            );
+        
+        //** SERVER ** - START
+        if(host){
+        	// Set position of all Player and Items
+        	for(int i = 0; i < server.getThreadSize(); i++){
+        		server.getPlayerAndPosition().put(
+        				i+"", 
+        				new MapPosition(
+        						map.getSpawnMap().getSpawnPoint(i).getX(),
+        						map.getSpawnMap().getSpawnPoint(i).getY()
+        						)
+        				);
+        	}
+        	
+        	server.updateClients(MessageTag.POSITION);
+        	
+        	// Wait until the Clients are updated
+        	try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+        	// Set on Server every position of a Player
+        	spawn();
+        }else{
+        	try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+        	// Set on Client every position of a Player
+        	spawn();
         }
-
+        //** SERVER ** - END
+        hp= new Healthbar();
+        
         items = new ArrayList<GameObject>();
         for(int i = 0; i < 10; i++){
             int position = new Random().nextInt(map.getFloorMap().getSize());
@@ -120,10 +151,6 @@ public class GameScreen implements Screen {
         }
 
         bullets = new ArrayList<Bullet>();
-
-        // Camera set to player position
-        camera.position.x = player.getX()+64;
-        camera.position.y = player.getY()+64;
         //** GAME ** -END
 
         //** GUI ** - START
@@ -158,40 +185,6 @@ public class GameScreen implements Screen {
         stage.addActor(hp.getBar());
         Gdx.input.setInputProcessor(stage);
         //** GUI ** - END
-        
-        //** SERVER ** - START
-        List<String> addresses = new ArrayList<String>();
-
-        try {
-            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-            for(NetworkInterface ni : Collections.list(interfaces)){
-                for(InetAddress address : Collections.list(ni.getInetAddresses())){
-                    if(address instanceof Inet4Address){
-                        addresses.add(address.getHostAddress());
-                    }
-                }
-            }
-        } catch (SocketException e) {
-            e.printStackTrace();
-        }
-
-        for(int i = 0; i < addresses.size(); i++){
-            Gdx.app.log("DEBUG","Address: " + addresses.get(i));
-        }
-
-        final Server server = new Server("localhost",9999);
-        new Thread(server).start();
-
-        Timer.schedule(new Timer.Task() {
-            @Override
-            public void run() {
-                new Thread(new Client(server.getIp(), server.getPort())).start();
-                new Thread(new Client(server.getIp(), server.getPort())).start();
-                new Thread(new Client(server.getIp(), server.getPort())).start();
-            }
-        }, 2);
-
-        //** SERVER ** - END
     }
 
     @Override
@@ -249,22 +242,30 @@ public class GameScreen implements Screen {
         	isMouse = true;
         }
         
-        player.collideWithMap(map.getCollisionMap());
-        player.move(percentX * playerSpeed, percentY * playerSpeed);
-        percentX = 0;
-        percentY = 0;
-
-        camera.position.x = player.getX()+64;
-        camera.position.y = player.getY()+64;
+        if(player != null){
+	        player.collideWithMap(map.getCollisionMap());
+	        player.move(percentX * playerSpeed, percentY * playerSpeed);
+	        percentX = 0;
+	        percentY = 0;
+	
+	        camera.position.x = player.getX()+64;
+	        camera.position.y = player.getY()+64;
+	        
+	        collidedItemName = player.collideWithObject(items);
+	        
+	        // Update Position
+	        client.getClientSendHandler().updateClients(MessageTag.POSITION, new MapPosition(player.getX()+64, player.getY()+64));
+        }
 
         map.render(camera);
 
         // Items
-        collidedItemName = player.collideWithObject(items);
         for(int i = 0; i < items.size(); i++){
             if(collidedItemName.equals(items.get(i).getName())) {
                 //Gdx.app.log("DEBUG",items.get(i).getName() + " touched");
-                player.giveItemBehaviour(items, items.get(i));
+            	if(player != null){
+            		player.giveItemBehaviour(items, items.get(i));
+            	}
                 items.remove(i);
             }else{
                 items.get(i).render(batch, camera);
@@ -273,19 +274,30 @@ public class GameScreen implements Screen {
         }
 
         // Enemies
-        for(int i = 0; i < enemies.size(); i++){
-            if(collidedEnemyName.equals(enemies.get(i).getName())){
-                enemies.remove(i);
-            }else {
-                enemies.get(i).render(batch, camera);
-                enemies.get(i).setRender(true);
-            }
-        }
-
         if(enemies.size() == 0){
-            respawn();
+            //respawn();
             collidedEnemyName = "";
             collidedItemName = "";
+        } else {
+        	 for(int i = 0; i < enemies.size(); i++){
+                 if(collidedEnemyName.equals(enemies.get(i).getName())){
+                     enemies.remove(i);
+                 }else {
+                	 enemies.get(i).render(batch, camera);
+                     enemies.get(i).setRender(true);
+                     
+                     if(client.getPlayerAndPosition() != null && player != null){
+    	                 // Update Position of other Players
+    	                 MapPosition mapposition = (MapPosition) client.getPlayerAndPosition().get(enemies.get(i).getName());
+    	                 
+    	                 if (mapposition != null) {
+    	                	 //Gdx.app.log("DEBUG", mapposition.getX() + ":" + mapposition.getY());
+    	                	 enemies.get(i).setX(mapposition.getX()-64);
+    		                 enemies.get(i).setY(mapposition.getY()-64);
+    	                 }
+                     }
+                 }
+             }
         }
 
         // Bullets
@@ -349,6 +361,35 @@ public class GameScreen implements Screen {
 
     }
 
+    private void spawn(){
+    	for(int i = 0; i < client.getPlayerAndPosition().size(); i++){
+    		if(client.getId() == i){
+	        	player = new Player(
+	                    "data/playerExample.png",
+	                    ((MapPosition) client.getPlayerAndPosition().get(i+"")).getX()-64,
+	                    ((MapPosition) client.getPlayerAndPosition().get(i+"")).getY()-64,
+	                    i+""
+	            );
+	        	// Render player
+	        	player.setRender(true);
+	        	
+	        	// Camera set to player position
+	            camera.position.x = player.getX()+64;
+	            camera.position.y = player.getY()+64;
+    		} else {
+                enemies.add(
+                        new GameObject(
+                                "data/playerExample.png",
+                                ((MapPosition) client.getPlayerAndPosition().get(i+"")).getX()-64,
+    		                    ((MapPosition) client.getPlayerAndPosition().get(i+"")).getY()-64,
+    		                    i+""
+                        )
+                );
+    		}
+    	}
+    }
+    
+    /*
     private void respawn(){
         round++;
         for(int i = 1; i < map.getSpawnMap().getSize(); i++){
@@ -370,6 +411,7 @@ public class GameScreen implements Screen {
         );
         player.setRender(true);
     }
+    */
 
 
 }
