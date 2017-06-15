@@ -29,6 +29,12 @@ public class Client implements Runnable {
     private boolean startGame;
     
     private HashMap<String, MapPosition> playerAndPosition;
+    private HashMap<String, Integer> playerAndHealth;
+    private HashMap<String, MapPosition> itemAndPosition;
+    private HashMap<String, Boolean> itemAndTaken;
+    private HashMap<String, Boolean> playerAndGodMode;
+    private HashMap<String, MapPosition> bulletAndPosition;
+    private HashMap<String, Boolean> bulletAndExist;
     private int id;
     
     private ClientSendHandler clientSendHandler;
@@ -39,6 +45,12 @@ public class Client implements Runnable {
         this.port = port;
         startGame = false;
         playerAndPosition = new HashMap<String, MapPosition>();
+        playerAndHealth = new HashMap<String, Integer>();
+        itemAndPosition = new HashMap<String, MapPosition>();
+        itemAndTaken = new HashMap<String, Boolean>();
+        playerAndGodMode = new HashMap<String, Boolean>();
+        bulletAndPosition = new HashMap<String, MapPosition>();
+        bulletAndExist = new HashMap<String, Boolean>();
     }
 
     @Override
@@ -67,11 +79,11 @@ public class Client implements Runnable {
 
     }
     
-	public ClientSendHandler getClientSendHandler() {
+	public synchronized ClientSendHandler getClientSendHandler() {
 		return clientSendHandler;
 	}
 
-	public void setClientSendHandler(ClientSendHandler clientSendReceiveHandler) {
+	public synchronized void setClientSendHandler(ClientSendHandler clientSendReceiveHandler) {
 		this.clientSendHandler = clientSendReceiveHandler;
 	}
 
@@ -82,6 +94,14 @@ public class Client implements Runnable {
 	public void setId(int id) {
 		this.id = id;
 	}
+	
+	public synchronized HashMap<String, Integer> getPlayerAndHealth() {
+		return playerAndHealth;
+	}
+
+	public synchronized void setPlayerAndHealth(HashMap<String, Integer> playerAndHealth) {
+		this.playerAndHealth = playerAndHealth;
+	}
 
 	public synchronized HashMap<String, MapPosition> getPlayerAndPosition() {
 		return playerAndPosition;
@@ -89,6 +109,46 @@ public class Client implements Runnable {
 
 	public synchronized void setPlayerAndPosition(HashMap<String, MapPosition> playerAndPosition) {
 		this.playerAndPosition = playerAndPosition;
+	}
+	
+	public synchronized HashMap<String, MapPosition> getItemAndPosition() {
+		return itemAndPosition;
+	}
+
+	public synchronized void setItemAndPosition(HashMap<String, MapPosition> itemAndPosition) {
+		this.itemAndPosition = itemAndPosition;
+	}
+
+	public synchronized HashMap<String, Boolean> getItemAndTaken() {
+		return itemAndTaken;
+	}
+
+	public synchronized void setItemAndTaken(HashMap<String, Boolean> itemAndTaken) {
+		this.itemAndTaken = itemAndTaken;
+	}
+
+	public synchronized HashMap<String, Boolean> getPlayerAndGodMode() {
+		return playerAndGodMode;
+	}
+
+	public synchronized void setPlayerAndGodMode(HashMap<String, Boolean> playerAndGodMode) {
+		this.playerAndGodMode = playerAndGodMode;
+	}
+
+	public synchronized HashMap<String, MapPosition> getBulletAndPosition() {
+		return bulletAndPosition;
+	}
+
+	public synchronized void setBulletAndPosition(HashMap<String, MapPosition> bulletAndPosition) {
+		this.bulletAndPosition = bulletAndPosition;
+	}
+
+	public synchronized HashMap<String, Boolean> getBulletAndExist() {
+		return bulletAndExist;
+	}
+
+	public synchronized void setBulletAndExist(HashMap<String, Boolean> bulletAndExist) {
+		this.bulletAndExist = bulletAndExist;
 	}
 
 	public boolean isStartGame() {

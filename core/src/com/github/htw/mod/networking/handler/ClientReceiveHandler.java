@@ -3,6 +3,7 @@ package com.github.htw.mod.networking.handler;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.Map;
 
 import com.badlogic.gdx.Gdx;
 import com.github.htw.mod.networking.Client;
@@ -51,7 +52,7 @@ public class ClientReceiveHandler implements Runnable{
 						client.setStartGame(message.isBooleanMessage());
 					}
 					
-					if(message.getLabelMessage().equals(MessageTag.POSITION)){
+					if(message.getLabelMessage().equals(MessageTag.PLAYERPOSITION)){
 						
 						// DEBUG -------
 						/*
@@ -63,7 +64,49 @@ public class ClientReceiveHandler implements Runnable{
 						*/
 						// DEBUG -------
 						
-						client.setPlayerAndPosition(message.getHashmapMessage());
+						client.setPlayerAndPosition(message.getMessageHashMap().getHashMapMapPositionMessage());
+					}
+					
+					if(message.getLabelMessage().equals(MessageTag.PLAYERHEALTH)){
+						client.setPlayerAndHealth(message.getMessageHashMap().getHashMapIntegerMessage());
+					}
+					
+					if(message.getLabelMessage().equals(MessageTag.ITEMPOSITION)){
+						client.setItemAndPosition(message.getMessageHashMap().getHashMapMapPositionMessage());
+					}
+					
+					if(message.getLabelMessage().equals(MessageTag.ITEMTAKEN)){
+						client.setItemAndTaken(message.getMessageHashMap().getHashMapBooleanMessage());
+					}
+					
+					if(message.getLabelMessage().equals(MessageTag.PLAYERGODMODE)){
+						client.setPlayerAndGodMode(message.getMessageHashMap().getHashMapBooleanMessage());
+					}
+					
+					if(message.getLabelMessage().equals(MessageTag.PLAYERBULLETEXIST)){
+						client.setBulletAndExist(message.getMessageHashMap().getHashMapBooleanMessage());
+						
+						/*
+						for (Map.Entry<String, Boolean> entry : client.getBulletAndExist().entrySet()) {
+				    	    String key = entry.getKey();
+				    	    boolean value = entry.getValue();
+				    	    
+				    	    Gdx.app.log("DEBUG", key + "!" + value);
+						}
+						*/
+					}
+					
+					if(message.getLabelMessage().equals(MessageTag.PLAYERBULLETPOSITION)){
+						client.setBulletAndPosition(message.getMessageHashMap().getHashMapMapPositionMessage());
+						
+						/*
+						for (Map.Entry<String, MapPosition> entry : client.getBulletAndPosition().entrySet()) {
+				    	    String key = entry.getKey();
+				    	    MapPosition value = entry.getValue();
+				    	    
+				    	    Gdx.app.log("DEBUG", key + "!" + value.getX() + ":" + value.getY());
+						}
+						*/
 					}
 				}
 				

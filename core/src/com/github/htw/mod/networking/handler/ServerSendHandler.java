@@ -8,6 +8,7 @@ import java.util.HashMap;
 import com.badlogic.gdx.Gdx;
 import com.github.htw.mod.networking.ServerThread;
 import com.github.htw.mod.networking.message.Message;
+import com.github.htw.mod.networking.message.MessageHashMap;
 import com.github.htw.mod.networking.message.MessageTag;
 import com.github.htw.mod.point.MapPosition;
 
@@ -47,7 +48,7 @@ public class ServerSendHandler implements Runnable {
 	        		serverThread.setTriggerMessage("");
 	        	}
 	        	
-	        	if(serverThread.getTriggerMessage().equals(MessageTag.POSITION)){
+	        	if(serverThread.getTriggerMessage().equals(MessageTag.PLAYERPOSITION)){
 	        		
 	        		// DEBUG: --------
 					/*
@@ -56,7 +57,9 @@ public class ServerSendHandler implements Runnable {
 					*/
 					// DEBUG: --------
 	        		
-	        		message = new Message(MessageTag.POSITION, serverThread.getServer().getPlayerAndPosition());
+	        		MessageHashMap hashMap = new MessageHashMap();
+	        		hashMap.setHashMapMapPositionMessage(serverThread.getServer().getPlayerAndPosition());
+	        		message = new Message(MessageTag.PLAYERPOSITION, hashMap);
 	        		
 	        		// DEBUG: --------
 	        		/*
@@ -64,6 +67,63 @@ public class ServerSendHandler implements Runnable {
 					Gdx.app.log("SERVERTHREAD"+serverThread.getId(), mp.getX() +":"+ mp.getY());
 					*/
 					// DEBUG: --------
+	        		
+	        		objectOutputStream.writeObject(message);
+	        		serverThread.setTriggerMessage("");
+	        	}
+	        	
+	        	if(serverThread.getTriggerMessage().equals(MessageTag.PLAYERHEALTH)){
+	        		
+	        		MessageHashMap hashMap = new MessageHashMap();
+	        		hashMap.setHashMapIntegerMessage(serverThread.getServer().getPlayerAndHealth());
+	        		message = new Message(MessageTag.PLAYERHEALTH, hashMap);
+	        		
+	        		objectOutputStream.writeObject(message);
+	        		serverThread.setTriggerMessage("");
+	        	}
+	        	
+	        	if(serverThread.getTriggerMessage().equals(MessageTag.ITEMPOSITION)){
+	        		
+	        		MessageHashMap hashMap = new MessageHashMap();
+	        		hashMap.setHashMapMapPositionMessage(serverThread.getServer().getItemAndPosition());
+	        		message = new Message(MessageTag.ITEMPOSITION, hashMap);
+	        		
+	        		objectOutputStream.writeObject(message);
+	        		serverThread.setTriggerMessage("");
+	        	}
+	        	
+	        	if(serverThread.getTriggerMessage().equals(MessageTag.ITEMTAKEN)){
+	        		MessageHashMap hashMap = new MessageHashMap();
+	        		hashMap.setHashMapBooleanMessage(serverThread.getServer().getItemAndTaken());
+	        		message = new Message(MessageTag.ITEMTAKEN, hashMap);
+	        		
+	        		objectOutputStream.writeObject(message);
+	        		serverThread.setTriggerMessage("");
+	        	}
+	        	
+	        	if(serverThread.getTriggerMessage().equals(MessageTag.PLAYERGODMODE)){
+	        		MessageHashMap hashMap = new MessageHashMap();
+	        		hashMap.setHashMapBooleanMessage(serverThread.getServer().getPlayerAndGodMode());
+	        		message = new Message(MessageTag.PLAYERGODMODE, hashMap);
+	        		
+	        		objectOutputStream.writeObject(message);
+	        		serverThread.setTriggerMessage("");
+	        	}
+	        	
+	        	if(serverThread.getTriggerMessage().equals(MessageTag.PLAYERBULLETEXIST)){
+	        		MessageHashMap hashMap = new MessageHashMap();
+	        		hashMap.setHashMapBooleanMessage(serverThread.getServer().getBulletAndExist());
+	        		message = new Message(MessageTag.PLAYERBULLETEXIST, hashMap);
+	        		
+	        		objectOutputStream.writeObject(message);
+	        		serverThread.setTriggerMessage("");
+	        	}
+	        	
+	        	if(serverThread.getTriggerMessage().equals(MessageTag.PLAYERBULLETPOSITION)){
+	        		
+	        		MessageHashMap hashMap = new MessageHashMap();
+	        		hashMap.setHashMapMapPositionMessage(serverThread.getServer().getBulletAndPosition());
+	        		message = new Message(MessageTag.PLAYERBULLETPOSITION, hashMap);
 	        		
 	        		objectOutputStream.writeObject(message);
 	        		serverThread.setTriggerMessage("");

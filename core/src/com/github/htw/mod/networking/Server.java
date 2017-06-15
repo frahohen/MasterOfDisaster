@@ -21,6 +21,12 @@ public class Server implements Runnable {
     
     private int numberOfClientsConnected;
     private HashMap<String, MapPosition> playerAndPosition;
+    private HashMap<String, Integer> playerAndHealth;
+    private HashMap<String, MapPosition> itemAndPosition;
+    private HashMap<String, Boolean> itemAndTaken;
+    private HashMap<String, Boolean> playerAndGodMode;
+    private HashMap<String, MapPosition> bulletAndPosition;
+    private HashMap<String, Boolean> bulletAndExist;
 
     public Server(String ip, int port) {
         this.ip = ip;
@@ -29,6 +35,12 @@ public class Server implements Runnable {
         id = 0;
         serverThreads = new ArrayList<ServerThread>();
         playerAndPosition = new HashMap<String, MapPosition>();
+        playerAndHealth = new HashMap<String, Integer>();
+        itemAndPosition = new HashMap<String, MapPosition>();
+        itemAndTaken = new HashMap<String, Boolean>();
+        playerAndGodMode = new HashMap<String, Boolean>();
+        bulletAndPosition = new HashMap<String, MapPosition>();
+        bulletAndExist = new HashMap<String, Boolean>();
     }
 
     @Override
@@ -64,7 +76,37 @@ public class Server implements Runnable {
         		serverThreads.get(i).setTriggerMessage(labelMessage);
         	}
         	
-        	if(labelMessage.equals(MessageTag.POSITION)){
+        	if(labelMessage.equals(MessageTag.PLAYERPOSITION)){
+        		//Create for every Server Thread a Message that is been send
+        		serverThreads.get(i).setTriggerMessage(labelMessage);
+        	}
+        	
+        	if(labelMessage.equals(MessageTag.PLAYERHEALTH)){
+        		//Create for every Server Thread a Message that is been send
+        		serverThreads.get(i).setTriggerMessage(labelMessage);
+        	}
+        	
+        	if(labelMessage.equals(MessageTag.ITEMPOSITION)){
+        		//Create for every Server Thread a Message that is been send
+        		serverThreads.get(i).setTriggerMessage(labelMessage);
+        	}
+        	
+        	if(labelMessage.equals(MessageTag.ITEMTAKEN)){
+        		//Create for every Server Thread a Message that is been send
+        		serverThreads.get(i).setTriggerMessage(labelMessage);
+        	}
+        	
+        	if(labelMessage.equals(MessageTag.PLAYERGODMODE)){
+        		//Create for every Server Thread a Message that is been send
+        		serverThreads.get(i).setTriggerMessage(labelMessage);
+        	}
+        	
+        	if(labelMessage.equals(MessageTag.PLAYERBULLETPOSITION)){
+        		//Create for every Server Thread a Message that is been send
+        		serverThreads.get(i).setTriggerMessage(labelMessage);
+        	}
+        	
+        	if(labelMessage.equals(MessageTag.PLAYERBULLETEXIST)){
         		//Create for every Server Thread a Message that is been send
         		serverThreads.get(i).setTriggerMessage(labelMessage);
         	}
@@ -89,6 +131,54 @@ public class Server implements Runnable {
 
 	public synchronized void setPlayerAndPosition(HashMap<String, MapPosition> playerAndPosition) {
 		this.playerAndPosition = playerAndPosition;
+	}
+
+	public synchronized HashMap<String, Integer> getPlayerAndHealth() {
+		return playerAndHealth;
+	}
+
+	public synchronized void setPlayerAndHealth(HashMap<String, Integer> playerAndHealth) {
+		this.playerAndHealth = playerAndHealth;
+	}
+
+	public synchronized HashMap<String, MapPosition> getItemAndPosition() {
+		return itemAndPosition;
+	}
+
+	public synchronized void setItemAndPosition(HashMap<String, MapPosition> itemAndPosition) {
+		this.itemAndPosition = itemAndPosition;
+	}
+
+	public synchronized HashMap<String, Boolean> getItemAndTaken() {
+		return itemAndTaken;
+	}
+
+	public synchronized void setItemAndTaken(HashMap<String, Boolean> itemAndTaken) {
+		this.itemAndTaken = itemAndTaken;
+	}
+
+	public synchronized HashMap<String, Boolean> getPlayerAndGodMode() {
+		return playerAndGodMode;
+	}
+
+	public synchronized void setPlayerAndGodMode(HashMap<String, Boolean> playerAndGodMode) {
+		this.playerAndGodMode = playerAndGodMode;
+	}
+
+	public synchronized HashMap<String, MapPosition> getBulletAndPosition() {
+		return bulletAndPosition;
+	}
+
+	public synchronized void setBulletAndPosition(HashMap<String, MapPosition> bulletAndPosition) {
+		this.bulletAndPosition = bulletAndPosition;
+	}
+	
+	public synchronized HashMap<String, Boolean> getBulletAndExist() {
+		return bulletAndExist;
+	}
+
+	public synchronized void setBulletAndExist(HashMap<String, Boolean> bulletAndExist) {
+		this.bulletAndExist = bulletAndExist;
 	}
 
 	public String getIp() {

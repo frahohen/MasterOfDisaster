@@ -14,8 +14,8 @@ public class Message implements Serializable {
     private int intMessage;
     private float floatMessage;
     private double doubleMessage;
-    private HashMap<String,MapPosition> hashmapMessage;
-    private MapPosition pointPosition;
+    private MessageHashMap messageHashMap;
+    private MapPosition mapPosition;
     
 	public Message(String labelMessage) {
 		super();
@@ -25,13 +25,13 @@ public class Message implements Serializable {
 	public Message(String labelMessage, MapPosition mapPosition) {
 		super();
 		this.labelMessage = labelMessage;
-		this.pointPosition = mapPosition;
+		this.mapPosition = mapPosition;
 	}
-
-	public Message(String labelMessage, HashMap<String, MapPosition> hashmapMessage) {
+	
+	public Message(String labelMessage, MessageHashMap messageHashMap) {
 		super();
 		this.labelMessage = labelMessage;
-		this.hashmapMessage = hashmapMessage;
+		this.messageHashMap = messageHashMap;
 	}
 
 	public Message(String labelMessage, String stringMessage) {
@@ -100,16 +100,20 @@ public class Message implements Serializable {
 	public void setDoubleMessage(double doubleMessage) {
 		this.doubleMessage = doubleMessage;
 	}
-	public HashMap<String, MapPosition> getHashmapMessage() {
-		return hashmapMessage;
-	}
-	public void setHashmapMessage(HashMap<String, MapPosition> hashmapMessage) {
-		this.hashmapMessage = hashmapMessage;
-	}
+	
 	public MapPosition getMapPosition() {
-		return pointPosition;
+		return mapPosition;
 	}
-	public void setMapPosition(MapPosition pointPosition) {
-		this.pointPosition = pointPosition;
+	public void setMapPosition(MapPosition mapPosition) {
+		this.mapPosition = mapPosition;
+	}
+
+	public MessageHashMap getMessageHashMap() {
+		return messageHashMap;
+	}
+
+	public void setMessageHashMap(MessageHashMap messageHashMap) {
+		this.messageHashMap = messageHashMap;
 	}	
+	
 }

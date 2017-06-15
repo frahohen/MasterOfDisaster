@@ -73,11 +73,11 @@ public class ServerThread implements Runnable{
         } 
     }
     
-	public Server getServer() {
+	public synchronized Server getServer() {
 		return server;
 	}
 
-	public void setServer(Server server) {
+	public synchronized void setServer(Server server) {
 		this.server = server;
 	}
 

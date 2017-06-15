@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Timer;
+import com.github.htw.mod.networking.Client;
 
 import java.util.ArrayList;
 
@@ -12,8 +13,9 @@ public class Player extends GameObject {
     private float x;
     private float y;
 
-    private float health;
     private boolean godMode;
+    private int healthPoints;
+    private int score;
 
     public Player(String avatar, float x, float y, String name){
         super(avatar,x,y,name);
@@ -98,11 +100,37 @@ public class Player extends GameObject {
         this.setX(x);
         this.setY(y);
     }
+    
+    public int getScore() {
+		return score;
+	}
 
-    private void init(float x, float y){
+	public void setScore(int score) {
+		this.score = score;
+	}
+
+	public boolean isGodMode() {
+		return godMode;
+	}
+
+	public void setGodMode(boolean godMode) {
+		this.godMode = godMode;
+	}
+
+	public int getHealthPoints() {
+		return healthPoints;
+	}
+
+	public void setHealthPoints(int healthPoints) {
+		this.healthPoints = healthPoints;
+	}
+
+	private void init(float x, float y){
 
         this.godMode = false;
         this.x = x;
         this.y = y;
+        this.healthPoints = 100;
+        this.score = 0;
     }
 }

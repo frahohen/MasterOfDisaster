@@ -37,11 +37,4 @@ public class Bullet extends GameObject {
     public void setEnemyName(String enemyName) {
         EnemyName = enemyName;
     }
-
-    public int checkScore(int score){
-        if(!this.getEnemyName().equals("")) {
-            score += 10;
-        }
-        return score;
-    }
 }

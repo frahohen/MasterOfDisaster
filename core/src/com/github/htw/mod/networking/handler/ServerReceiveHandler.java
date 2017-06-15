@@ -34,7 +34,7 @@ public class ServerReceiveHandler implements Runnable {
 				
 				message = (Message) objectInputStream.readObject();
 				if( message != null){
-					if(message.getLabelMessage().equals(MessageTag.POSITION)){
+					if(message.getLabelMessage().equals(MessageTag.PLAYERPOSITION)){
 						//Gdx.app.log("SERVERTHREAD", message.getLabelMessage() + ":" + message.getPointPosition().getX() + ":" + message.getPointPosition().getY());
 						serverThread.getServer().getPlayerAndPosition().put(serverThread.getId()+"",message.getMapPosition());
 						
@@ -47,6 +47,58 @@ public class ServerReceiveHandler implements Runnable {
 						
 			    		serverThread.getServer().updateClients(message.getLabelMessage());
 			    	}
+					
+					if(message.getLabelMessage().equals(MessageTag.PLAYERHEALTH)){
+						String stringMessage = message.getStringMessage();
+						String[] stringArray = stringMessage.split(":");
+						
+						serverThread.getServer().getPlayerAndHealth().put(stringArray[0], Integer.parseInt(stringArray[1]));
+						//Gdx.app.log("DEBUG", stringArray[0]+":"+stringArray[1]);
+						
+						serverThread.getServer().updateClients(message.getLabelMessage());
+					}
+					
+					if(message.getLabelMessage().equals(MessageTag.ITEMTAKEN)){
+						serverThread.getServer().getItemAndTaken().put(message.getStringMessage(), true);
+						serverThread.getServer().updateClients(message.getLabelMessage());
+					}
+					
+					if(message.getLabelMessage().equals(MessageTag.PLAYERGODMODE)){
+						serverThread.getServer().getPlayerAndGodMode().put(serverThread.getId()+"", message.isBooleanMessage());
+						serverThread.getServer().updateClients(message.getLabelMessage());
+					}
+					
+					if(message.getLabelMessage().equals(MessageTag.PLAYERBULLETEXIST)){
+						String stringMessage = message.getStringMessage();
+						String[] stringArray = stringMessage.split("!");
+						
+						
+						//Gdx.app.log("DEBUG", stringMessage);
+						if(stringArray[1].equals("true")){
+							serverThread.getServer().getBulletAndExist().put(stringArray[0],true);
+						}
+						if(stringArray[1].equals("false")){
+							serverThread.getServer().getBulletAndExist().put(stringArray[0],false);
+						}
+						serverThread.getServer().updateClients(message.getLabelMessage());
+					}
+					
+					if(message.getLabelMessage().equals(MessageTag.PLAYERBULLETPOSITION)){
+						String stringMessage = message.getStringMessage();
+						String[] stringArrayOne = stringMessage.split("!");
+						String[] stringArrayTwo = stringArrayOne[1].split(":");
+						
+						//Gdx.app.log("DEBUG", stringMessage);
+						serverThread.getServer().getBulletAndPosition().put(
+								stringArrayOne[0], 
+								new MapPosition(
+										Float.parseFloat(stringArrayTwo[0]), 
+										Float.parseFloat(stringArrayTwo[1])
+										)
+								);
+						
+						serverThread.getServer().updateClients(message.getLabelMessage());
+					}
 				}
 				
 				message = null;

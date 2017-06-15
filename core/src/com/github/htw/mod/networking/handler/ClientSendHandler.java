@@ -17,7 +17,9 @@ public class ClientSendHandler implements Runnable {
 	private Client client;
 	private Message message;
 	private String triggerMessage;
-	private MapPosition mapPosition;
+	private MapPosition mapPositionMessage;
+	private String stringMessage;
+	private Boolean booleanMessage;
 	
 	public ClientSendHandler(ObjectInputStream objectInputStream, ObjectOutputStream objectOutputStream,
 			Client client) {
@@ -26,6 +28,7 @@ public class ClientSendHandler implements Runnable {
 		this.objectOutputStream = objectOutputStream;
 		this.client = client;
 		this.triggerMessage = "";
+		this.stringMessage = "";
 	}
 
 	@Override
@@ -33,11 +36,42 @@ public class ClientSendHandler implements Runnable {
 		// TODO Auto-generated method stub
 		while(true){
 			try {
-				Thread.sleep(1);
+				Thread.sleep(10);
 				
-				if(triggerMessage.equals(MessageTag.POSITION)){
+				if(triggerMessage.equals(MessageTag.PLAYERPOSITION)){
 					//Gdx.app.log("Debug", "I am sending");
-					message = new Message(MessageTag.POSITION, mapPosition);
+					message = new Message(MessageTag.PLAYERPOSITION, mapPositionMessage);
+					objectOutputStream.writeObject(message);
+					triggerMessage = "";
+				}
+				
+				if(triggerMessage.equals(MessageTag.PLAYERHEALTH)){
+					message = new Message(MessageTag.PLAYERHEALTH, stringMessage);
+					objectOutputStream.writeObject(message);
+					triggerMessage = "";
+				}
+				
+				if(triggerMessage.equals(MessageTag.ITEMTAKEN)){
+					message = new Message(MessageTag.ITEMTAKEN, stringMessage);
+					objectOutputStream.writeObject(message);
+					triggerMessage = "";
+				}
+				
+				if(triggerMessage.equals(MessageTag.PLAYERGODMODE)){
+					message = new Message(MessageTag.PLAYERGODMODE, booleanMessage);
+					objectOutputStream.writeObject(message);
+					triggerMessage = "";
+				}
+				
+				if(triggerMessage.equals(MessageTag.PLAYERBULLETEXIST)){
+					message = new Message(MessageTag.PLAYERBULLETEXIST, stringMessage);
+					objectOutputStream.writeObject(message);
+					triggerMessage = "";
+				}
+				
+				if(triggerMessage.equals(MessageTag.PLAYERBULLETPOSITION)){
+					//Gdx.app.log("Debug", "I am sending");
+					message = new Message(MessageTag.PLAYERBULLETPOSITION, stringMessage);
 					objectOutputStream.writeObject(message);
 					triggerMessage = "";
 				}
@@ -55,9 +89,19 @@ public class ClientSendHandler implements Runnable {
 		}
 	}
 
-	public void updateClients(String labelMessage, MapPosition mapPosition){
+	public synchronized void updateClients(String labelMessage, MapPosition mapPositionMessage){
 		//Gdx.app.log("DEBUG", labelMessage);
-    	this.mapPosition = mapPosition;
+    	this.mapPositionMessage = mapPositionMessage;
     	this.triggerMessage = labelMessage;
     }
+	
+	public synchronized void updateClients(String labelMessage, String stringMessage){
+    	this.stringMessage = stringMessage;
+    	this.triggerMessage = labelMessage;
+    }
+	
+	public synchronized void updateClients(String labelMessage, Boolean booleanMessage){
+		this.booleanMessage = booleanMessage;
+		this.triggerMessage = labelMessage;
+	}
 }
